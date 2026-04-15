@@ -11,6 +11,7 @@ import Sidebar from "./components/Sidebar";
 import { getAppTheme } from "./theme/AppTheme";
 import logo from "./assets/logo3.png";
 import Home from "./pages/Home";
+import newBooke from "./pages/newBooke";
 const cacheRtl = createCache({
   key: "muirtl",
   stylisPlugins: [prefixer, rtlPlugin],
@@ -31,14 +32,7 @@ function App() {
       case "home":
         return <Home darkMode={darkMode} />;
       case "newBooks":
-        return (
-          <Box>
-            <Typography variant="h4" sx={{ color: "#541029", mb: 2 }}>
-              إدارة الكتب
-            </Typography>
-            <Typography>هنا يمكنك إضافة وحذف وتعديل الكتب.</Typography>
-          </Box>
-        );
+        return <newBooke />;
       case "plan":
         return (
           <Box>
@@ -76,7 +70,8 @@ function App() {
           </Box>
         );
       default:
-        return <Typography>الصفحة غير موجودة</Typography>;
+        <Typography>هنا يتم عرض التقارير الدورية للمكتبة.</Typography>;
+      // return <Home darkMode={darkMode} />;
     }
   };
 
