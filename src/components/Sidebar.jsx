@@ -5,40 +5,42 @@ import Brightness4Icon from "@mui/icons-material/Brightness4";
 import Brightness7Icon from "@mui/icons-material/Brightness7";
 
 const Sidebar = ({ open, onClose, darkMode, setDarkMode }) => {
-  return (
+return (
+    // 
     <Drawer anchor="right" open={open} onClose={onClose}>
-      <Box sx={{ width: 250 }} role="presentation">
+        <Box sx={{ width: 250 }} role="presentation">
+        
         <List>
           {/* الرئيسية */}
-          <ListItem disablePadding>
+            <ListItem disablePadding>
             <ListItemButton onClick={onClose}>
-              <ListItemIcon><HomeIcon /></ListItemIcon>
-              <ListItemText primary="الرئيسية" />
+                <ListItemIcon><HomeIcon /></ListItemIcon>
+                <ListItemText primary="الرئيسية" />
             </ListItemButton>
-          </ListItem>
+            </ListItem>
 
           {/* إدارة الكتب */}
-          <ListItem disablePadding>
+            <ListItem disablePadding>
             <ListItemButton onClick={onClose}>
-              <ListItemIcon><BookIcon /></ListItemIcon>
-              <ListItemText primary="إدارة الكتب" />
+                <ListItemIcon><BookIcon /></ListItemIcon>
+                <ListItemText primary="إدارة الكتب" />
             </ListItemButton>
-          </ListItem>
+            </ListItem>
 
           {/* تبديل الوضع الليلي */}
-          <ListItem>
+            <ListItem>
             <ListItemButton>
-              <ListItemIcon>
+                <ListItemIcon>
                 {darkMode ? <Brightness7Icon /> : <Brightness4Icon />}
-              </ListItemIcon>
-              <ListItemText primary="الوضع الليلي" />
-              <Switch checked={darkMode} onChange={() => setDarkMode(!darkMode)} />
+                </ListItemIcon>
+                <ListItemText primary="الوضع الليلي" />
+                <Switch checked={darkMode} onChange={() => setDarkMode(!darkMode)} />
             </ListItemButton>
-          </ListItem>
+            </ListItem>
         </List>
-      </Box>
+        </Box>
     </Drawer>
-  );
+);
 };
 
 export default Sidebar;

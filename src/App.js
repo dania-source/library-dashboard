@@ -11,7 +11,10 @@ import Sidebar from "./components/Sidebar";
 import { getAppTheme } from "./theme/AppTheme";
 import logo from "./assets/logo3.png";
 import Home from "./pages/Home";
-import newBooke from "./pages/newBooke";
+import NewBooke from "./pages/newBooke"; // تأكدي إن الحرف الأول كبير في المتغير
+import Plan from "./pages/Plan";
+import Login from "./pages/Login";
+import Books from "./pages/books"; // لا تنسي استيراد الصفحة الجديدة// غيريها لـ Plan بحرف كبير لتطابق المجلد
 const cacheRtl = createCache({
   key: "muirtl",
   stylisPlugins: [prefixer, rtlPlugin],
@@ -20,7 +23,9 @@ const cacheRtl = createCache({
 function App() {
   const [open, setOpen] = useState(false);
   const [darkMode, setDarkMode] = useState(false);
-
+  const [isAuthenticated, setIsAuthenticated] = useState(
+    !!localStorage.getItem("token"),
+  );
   // 1. تعريف حالة الصفحة النشطة (الافتراضية هي stats أو home)
   const [activePage, setActivePage] = useState("stats");
 
@@ -30,27 +35,14 @@ function App() {
   const renderContent = () => {
     switch (activePage) {
       case "home":
-        return <Home darkMode={darkMode} />;
+        return <Home />;
       case "newBooks":
-        return <newBooke />;
+        return <NewBooke />; // استخدمي الحرف الكبير هنا أيضاً
       case "plan":
-        return (
-          <Box>
-            <Typography variant="h4" sx={{ color: "#541029", mb: 2 }}>
-              التقارير
-            </Typography>
-            <Typography>هنا يتم عرض التقارير الدورية للمكتبة.</Typography>
-          </Box>
-        );
+        return <Plan />;
+
       case "Books":
-        return (
-          <Box>
-            <Typography variant="h4" sx={{ color: "#541029", mb: 2 }}>
-              التقارير
-            </Typography>
-            <Typography>هنا يتم عرض التقارير الدورية للمكتبة.</Typography>
-          </Box>
-        );
+        return <Books />;
       case "Suggestions":
         return (
           <Box>
@@ -70,15 +62,24 @@ function App() {
           </Box>
         );
       default:
-        <Typography>هنا يتم عرض التقارير الدورية للمكتبة.</Typography>;
-      // return <Home darkMode={darkMode} />;
+        // <Typography>هنا يتم عرض التقارير الدورية للمكتبة.</Typography>;
+        return <Home />;
     }
   };
+  if (!isAuthenticated) {
+    return (
+      <ThemeProvider theme={theme}>
+        <CssBaseline />
+        <Login setAuth={setIsAuthenticated} />
+      </ThemeProvider>
+    );
+  }
 
   return (
     <CacheProvider value={cacheRtl}>
       <ThemeProvider theme={theme}>
         <CssBaseline />
+        console.log(book.cover_img);
         <Box sx={{ flexGrow: 1 }} dir="rtl">
           <Navbar logo={logo} onMenuClick={() => setOpen(true)} />
 
@@ -103,9 +104,7 @@ function App() {
               sx={{
                 flexGrow: 1,
                 p: 3,
-                // التعديل هون:
-                // منused "الشرط" (Ternary Operator)
-                // إذا darkMode صح (true) حط لون غامق، وإذا خطأ (false) حط لونك البيج
+
                 bgcolor: darkMode ? "#2b2a28" : "#EFEDE1",
 
                 minHeight: "calc(100vh - 64px)",

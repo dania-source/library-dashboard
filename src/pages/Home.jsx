@@ -1,62 +1,80 @@
-// import React from "react";
-// import { Box, Typography,darkMode } from "@mui/material";
-
-// const Home = ({ darkMode }) => {
-//   return (
-//     <Box>
-//       <Typography variant="h4" sx={{ color: darkMode ?"#EFEDE1" : "#541029", mb: 2 }}>
-//         الإحصائيات
-//       </Typography>
-//       <Typography>
-//         هنا ستظهر إحصائيات المكتبة (عدد الكتب، المستخدمين، إلخ).
-//       </Typography>
-//     </Box>
-//   );
-// };
-
-// export default Home;
-import React from "react";
+import React, { useState, useEffect } from "react";
+import axios from "axios";
 import { 
   Table, TableBody, TableCell, TableContainer, 
-  TableHead, TableRow, Paper, Typography, Box, Chip 
+  TableHead, TableRow, Paper, Typography, Box, CircularProgress, LinearProgress 
 } from "@mui/material";
 
-const Home = () => {
-  // بيانات وهمية للمستخدمين
-  const users = [
-    { id: 1, name: "أحمد محمد", email: "ahmed@example.com", role: "مدير", status: "نشط" },
-    { id: 2, name: "سارة أحمد", email: "sara@example.com", role: "أمين مكتبة", status: "نشط" },
-    { id: 3, name: "خالد علي", email: "khaled@example.com", role: "مستخدم", status: "محظور" },
-  ];
+const Users = () => {
+  const [users, setUsers] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchUsers = async () => {
+      try {
+        // ملاحظة: يجب إرسال الـ Token في الـ Headers لأن الكود محمي
+        const token = localStorage.getItem("token"); 
+        
+        const response = await axios.get("http://127.0.0.1:8000/api/admin/users-progress", {
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+        });
+
+        // ركزي هنا: البيانات موجودة داخل response.data.data بناءً على كود الباك
+        if (response.data.success) {
+          setUsers(response.data.data);
+        }
+        setLoading(false);
+      } catch (error) {
+        console.error("خطأ في الربط:", error);
+        setLoading(false);
+      }
+    };
+
+    fetchUsers();
+  }, []);
+
+  if (loading) return <CircularProgress sx={{ display: 'block', m: 'auto', mt: 5 }} />;
 
   return (
-    <Box>
-      <Typography variant="h4" sx={{ color: "#541029", mb: 3, fontWeight: "bold" }}>
-        إدارة المستخدمين
+    <Box sx={{ p: 3 }}>
+      <Typography variant="h4" sx={{ mb: 3, color: "#541029", fontWeight: "bold" }}>
+        تقدم المستخدمين والأهداف الأسبوعية
       </Typography>
 
-      <TableContainer component={Paper} sx={{ borderRadius: 2, boxShadow: 3 }}>
-        <Table sx={{ minWidth: 650 }}>
+      <TableContainer component={Paper} sx={{ borderRadius: 2 }}>
+        <Table>
           <TableHead sx={{ bgcolor: "#541029" }}>
             <TableRow>
-              <TableCell sx={{ color: "white", fontWeight: "bold" }}>الاسم</TableCell>
-              <TableCell sx={{ color: "white", fontWeight: "bold" }}>البريد الإلكتروني</TableCell>
-              <TableCell sx={{ color: "white", fontWeight: "bold" }}>الصلاحية</TableCell>
-              <TableCell sx={{ color: "white", fontWeight: "bold" }}>الحالة</TableCell>
+              <TableCell sx={{ color: "white" }}>المستخدم</TableCell>
+              <TableCell sx={{ color: "white" }}>البريد الإلكتروني</TableCell>
+              <TableCell sx={{ color: "white" }}>إجمالي النقاط</TableCell>
+              <TableCell sx={{ color: "white" }}>نسبة الإنجاز</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
             {users.map((user) => (
-              <TableRow key={user.id} sx={{ '&:last-child td, &:last-child th': { border: 0 } }}>
+              <TableRow key={user.id}>
                 <TableCell>{user.name}</TableCell>
                 <TableCell>{user.email}</TableCell>
-                <TableCell>{user.role}</TableCell>
                 <TableCell>
-                  <Chip 
-                    label={user.status} 
-                    color={user.status === "نشط" ? "success" : "error"} 
-                    variant="outlined" 
-                  />
+                  <Typography sx={{ fontWeight: 'bold', color: '#2e7d32' }}>
+                    {user.points} نقطة
+                  </Typography>
+                </TableCell>
+                <TableCell sx={{ width: '250px' }}>
+                  {/* عرض نسبة التقدم كشريط مرئي */}
+                  <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                    <Box sx={{ width: '100%', mr: 1 }}>
+                      <LinearProgress 
+                        variant="determinate" 
+                        value={user.progress_percentage} 
+                        sx={{ height: 8, borderRadius: 5 }}
+                      />
+                    </Box>
+                    <Typography variant="body2">{Math.round(user.progress_percentage)}%</Typography>
+                  </Box>
                 </TableCell>
               </TableRow>
             ))}
@@ -67,4 +85,4 @@ const Home = () => {
   );
 };
 
-export default Home;
+export default Users;
