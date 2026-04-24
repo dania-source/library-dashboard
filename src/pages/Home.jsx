@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { 
   Table, TableBody, TableCell, TableContainer, 
-  TableHead, TableRow, Paper, Typography, Box, CircularProgress, LinearProgress 
+  TableHead, TableRow, Paper, Typography, Box, CircularProgress, Chip 
 } from "@mui/material";
 
 const Users = () => {
@@ -12,16 +12,13 @@ const Users = () => {
   useEffect(() => {
     const fetchUsers = async () => {
       try {
-        // ملاحظة: يجب إرسال الـ Token في الـ Headers لأن الكود محمي
         const token = localStorage.getItem("token"); 
-        
         const response = await axios.get("http://127.0.0.1:8000/api/admin/users-progress", {
           headers: {
             Authorization: `Bearer ${token}`
           }
         });
 
-        // ركزي هنا: البيانات موجودة داخل response.data.data بناءً على كود الباك
         if (response.data.success) {
           setUsers(response.data.data);
         }
@@ -35,51 +32,92 @@ const Users = () => {
     fetchUsers();
   }, []);
 
-  if (loading) return <CircularProgress sx={{ display: 'block', m: 'auto', mt: 5 }} />;
+  if (loading) return (
+    <Box sx={{ display: 'flex', justifyContent: 'center', mt: 10 }}>
+      <CircularProgress sx={{ color: "#541029" }} />
+    </Box>
+  );
 
   return (
-    <Box sx={{ p: 3 }}>
-      <Typography variant="h4" sx={{ mb: 3, color: "#541029", fontWeight: "bold" }}>
-        تقدم المستخدمين والأهداف الأسبوعية
+    <Box 
+      sx={{ 
+        // 1. الإزاحة لتجنب التداخل مع القائمة والشريط العلوي
+        marginRight: { xs: 0, md: "260px" }, // عرض القائمة الجانبية
+        marginTop: "64px", // ارتفاع الشريط العلوي (NavBar)
+        
+        // 2. جعل الخلفية تملأ كامل الشاشة ومنع المساحة البيضاء بالأسفل
+        minHeight: "calc(100vh - 64px)", 
+        bgcolor: "#f4f1ea", // لون الخلفية كما في الصورة
+        
+        p: 4,
+        display: "flex",
+        flexDirection: "column",
+        transition: "0.3s ease"
+      }}
+    >
+      {/* العنوان - محاذاة لليمين ولون متناسق */}
+      <Typography 
+        variant="h4" 
+        sx={{ 
+          mb: 4, 
+          color: "#541029", 
+          fontWeight: "bold", 
+          textAlign: 'right' 
+        }}
+      >
+        المستخدمين
       </Typography>
 
-      <TableContainer component={Paper} sx={{ borderRadius: 2 }}>
-        <Table>
-          <TableHead sx={{ bgcolor: "#541029" }}>
-            <TableRow>
-              <TableCell sx={{ color: "white" }}>المستخدم</TableCell>
-              <TableCell sx={{ color: "white" }}>البريد الإلكتروني</TableCell>
-              <TableCell sx={{ color: "white" }}>إجمالي النقاط</TableCell>
-              <TableCell sx={{ color: "white" }}>نسبة الإنجاز</TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {users.map((user) => (
-              <TableRow key={user.id}>
-                <TableCell>{user.name}</TableCell>
-                <TableCell>{user.email}</TableCell>
-                <TableCell>
-                  <Typography sx={{ fontWeight: 'bold', color: '#2e7d32' }}>
-                    {user.points} نقطة
-                  </Typography>
-                </TableCell>
-                <TableCell sx={{ width: '250px' }}>
-                  {/* عرض نسبة التقدم كشريط مرئي */}
-                  <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                    <Box sx={{ width: '100%', mr: 1 }}>
-                      <LinearProgress 
-                        variant="determinate" 
-                        value={user.progress_percentage} 
-                        sx={{ height: 8, borderRadius: 5 }}
-                      />
-                    </Box>
-                    <Typography variant="body2">{Math.round(user.progress_percentage)}%</Typography>
-                  </Box>
-                </TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
+      <TableContainer 
+        component={Paper} 
+        sx={{ 
+          borderRadius: 2, 
+          boxShadow: "0 4px 20px rgba(0,0,0,0.08)",
+          overflow: "hidden"
+        }}
+      >
+     <Table dir="rtl">
+  <TableHead sx={{ bgcolor: "#541029" }}>
+    <TableRow>
+      {/* 1. اسم المستخدم أولاً من اليمين */}
+      <TableCell align="left" sx={{ color: "white", fontWeight: "bold" }}>المستخدم</TableCell>
+      
+      {/* 2. اللقب في المنتصف */}
+      <TableCell align="center" sx={{ color: "white", fontWeight: "bold" }}>اللقب الحالي</TableCell>
+      
+      {/* 3. الكتب المنجزة في اليسار */}
+      <TableCell align="center" sx={{ color: "white", fontWeight: "bold" }}>الكتب المنجزة</TableCell>
+    </TableRow>
+  </TableHead>
+  
+  <TableBody>
+    {users.map((user, index) => (
+      <TableRow key={index} sx={{ '&:hover': { bgcolor: '#fcfaf7' } }}>
+        {/* يجب أن يتطابق ترتيب البيانات مع العناوين أعلاه */}
+        
+        {/* اسم المستخدم يظهر أولاً على اليمين */}
+        <TableCell align="leht" sx={{ fontWeight: "500" }}>
+          {user.name}
+        </TableCell>
+
+        {/* اللقب في المنتصف */}
+        <TableCell align="center">
+          <Chip 
+            label={user.nickname} 
+            sx={{ bgcolor: "#f0e4e8", color: "#541029", fontWeight: "bold" }} 
+          />
+        </TableCell>
+
+        {/* الكتب المنجزة في اليسار */}
+        <TableCell align="center">
+          <Typography sx={{ fontWeight: 'bold', color: '#2e7d32' }}>
+            {user.books_read} كتب
+          </Typography>
+        </TableCell>
+      </TableRow>
+    ))}
+  </TableBody>
+</Table>
       </TableContainer>
     </Box>
   );

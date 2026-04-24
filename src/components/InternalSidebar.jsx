@@ -5,13 +5,20 @@ import { Box, Typography, List, ListItemButton, ListItemText, Divider } from "@m
 const InternalSidebar = ({ darkMode, setActivePage }) => {
 return (
     <Box sx={{
-        width: "20%",
-        bgcolor: darkMode ? "#2b2a28" :"#E4DED2",
-        borderLeft: "6px solid",
-        borderColor: "#541029",
-        minHeight: "calc(100vh - 64px)",
-        p: 2,}}
-    >
+    width: "20%",
+    bgcolor: darkMode ? "#2b2a28" : "#E4DED2",
+    borderLeft: "6px solid",
+    borderColor: "#541029",
+    p: 2,
+    
+    // --- الإضافات لجعلها ثابتة ---
+    position: "sticky",    // تجعل العنصر يلتصق عند التمرير
+    top: "64px",           // المسافة من الأعلى (يفضل أن تكون نفس ارتفاع Navbar)
+    height: "calc(100vh - 64px)", // لكي تأخذ طول الشاشة بالكامل ناقص ارتفاع Navbar
+    overflowY: "auto",     // لكي يظهر سكرول داخلي للسايد بار إذا كثرت الخيارات
+    // ----------------------------
+}}
+>
     <Typography variant="h6" sx={{ mb: 2, color: "#541029", fontWeight: "bold" }}>
         الخيارات
     </Typography>
@@ -39,9 +46,9 @@ return (
 
         <ListItemButton 
         sx={{ borderRadius: 2 }} 
-        onClick={() => setActivePage("plan")}
+        onClick={() => setActivePage("suggestions")}
         >
-        <ListItemText primary="إضافة تحدي جديد" />
+        <ListItemText primary=" عرض التوصيات" />
         </ListItemButton>
 
 
@@ -58,18 +65,12 @@ return (
         
         <ListItemButton 
         sx={{ borderRadius: 2 }} 
-        onClick={() => setActivePage("Suggestions")}
+        onClick={() => setActivePage("updateBook")}
         >
-        <ListItemText primary=" عرض التوصيات" />
+        <ListItemText primary=" تعديل كتاب " />
         </ListItemButton>
          <Divider sx={{ my: 1 }} />
 
-        <ListItemButton 
-        sx={{ borderRadius: 2 }} 
-        onClick={() => setActivePage("Questions")}
-        >
-        <ListItemText primary=" عرض الأسئلة والإقتراحات" />
-        </ListItemButton>
 
         </List>
     </Box>

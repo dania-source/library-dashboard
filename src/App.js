@@ -12,9 +12,10 @@ import { getAppTheme } from "./theme/AppTheme";
 import logo from "./assets/logo3.png";
 import Home from "./pages/Home";
 import NewBooke from "./pages/newBooke"; // تأكدي إن الحرف الأول كبير في المتغير
-import Plan from "./pages/Plan";
+import Suggestions from "./pages/Suggestions";
 import Login from "./pages/Login";
-import Books from "./pages/books"; // لا تنسي استيراد الصفحة الجديدة// غيريها لـ Plan بحرف كبير لتطابق المجلد
+import Books from "./pages/books";
+import UpdateBook from "./pages/UpdateBook";
 const cacheRtl = createCache({
   key: "muirtl",
   stylisPlugins: [prefixer, rtlPlugin],
@@ -38,31 +39,15 @@ function App() {
         return <Home />;
       case "newBooks":
         return <NewBooke />; // استخدمي الحرف الكبير هنا أيضاً
-      case "plan":
-        return <Plan />;
+      case "suggestions":
+        // التوصيات
+        return <Suggestions />;
 
       case "Books":
         return <Books />;
-      case "Suggestions":
-        return (
-          <Box>
-            <Typography variant="h4" sx={{ color: "#541029", mb: 2 }}>
-              التوصيات
-            </Typography>
-            <Typography>هنا يتم عرض التقارير الدورية للمكتبة.</Typography>
-          </Box>
-        );
-      case "Questions":
-        return (
-          <Box>
-            <Typography variant="h4" sx={{ color: "#541029", mb: 2 }}>
-              الاسئله والاقتراحات
-            </Typography>
-            <Typography>هنا يتم عرض التقارير الدورية للمكتبة.</Typography>
-          </Box>
-        );
+      case "updateBook":
+        return <UpdateBook />;
       default:
-        // <Typography>هنا يتم عرض التقارير الدورية للمكتبة.</Typography>;
         return <Home />;
     }
   };
@@ -79,7 +64,7 @@ function App() {
     <CacheProvider value={cacheRtl}>
       <ThemeProvider theme={theme}>
         <CssBaseline />
-        console.log(book.cover_img);
+
         <Box sx={{ flexGrow: 1 }} dir="rtl">
           <Navbar logo={logo} onMenuClick={() => setOpen(true)} />
 
