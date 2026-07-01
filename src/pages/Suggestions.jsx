@@ -70,10 +70,23 @@ const handleAction = async (id, action) => {
     if (loading) return <Box sx={{ display: 'flex', justifyContent: 'center', p: 10 }}><CircularProgress /></Box>;
 
     return (
-        <Box sx={{ p: 4, direction: 'rtl' }}>
-            <Typography variant="h5" sx={{ mb: 3, fontWeight: 'bold' }}>لوحة تحكم المدير - طلبات الاقتراحات</Typography>
-            
-            {error && <Alert severity="error" sx={{ mb: 2 }}>{error}</Alert>}
+        <Box sx={{ p: 4, pt: '100px', direction: 'rtl' }}> 
+        
+        <Typography 
+            variant="h5" 
+            sx={{ 
+                mb: 4, 
+                fontWeight: 'bold',
+                color: '#333',
+                borderBottom: '2px solid #800020', // خط ديكوري أنيق تحت العنوان بلون الـ Navbar
+                pb: 1,
+                display: 'inline-block' // لجعل الخط على مقاس الكلام فقط
+            }}
+        >
+            لوحة تحكم المدير - طلبات الاقتراحات
+        </Typography>
+        
+        {error && <Alert severity="error" sx={{ mb: 2 }}>{error}</Alert>}
 
             <TableContainer component={Paper}>
                 <Table>

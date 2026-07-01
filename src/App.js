@@ -1,20 +1,19 @@
 import React, { useState } from "react";
-import { ThemeProvider, CssBaseline, Box, Typography } from "@mui/material";
+import { ThemeProvider, CssBaseline, Box } from "@mui/material";
 import { CacheProvider } from "@emotion/react";
 import createCache from "@emotion/cache";
 import { prefixer } from "stylis";
 import rtlPlugin from "stylis-plugin-rtl";
 import InternalSidebar from "./components/InternalSidebar";
-// استيراد المكونات التي صنعناها
 import Navbar from "./components/Navbar";
-import Sidebar from "./components/Sidebar";
 import { getAppTheme } from "./theme/AppTheme";
 import logo from "./assets/logo3.png";
 import Home from "./pages/Home";
-import NewBooke from "./pages/newBooke"; // تأكدي إن الحرف الأول كبير في المتغير
+import NewBooke from "./pages/newBooke";
 import Suggestions from "./pages/Suggestions";
 import Login from "./pages/Login";
 import Books from "./pages/books";
+import Analytics from "./pages/Analytics";
 import UpdateBook from "./pages/UpdateBook";
 const cacheRtl = createCache({
   key: "muirtl",
@@ -27,22 +26,20 @@ function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(
     !!localStorage.getItem("token"),
   );
-  // 1. تعريف حالة الصفحة النشطة (الافتراضية هي stats أو home)
   const [activePage, setActivePage] = useState("stats");
 
   const theme = getAppTheme(darkMode);
 
-  // 2. دالة لتبديل المحتوى بناءً على الاختيار
   const renderContent = () => {
     switch (activePage) {
       case "home":
         return <Home />;
+      case "analytics": // إضافة هذا الجزء
+        return <Analytics />;
       case "newBooks":
-        return <NewBooke />; // استخدمي الحرف الكبير هنا أيضاً
+        return <NewBooke />;
       case "suggestions":
-        // التوصيات
         return <Suggestions />;
-
       case "Books":
         return <Books />;
       case "updateBook":
@@ -66,34 +63,21 @@ function App() {
         <CssBaseline />
 
         <Box sx={{ flexGrow: 1 }} dir="rtl">
-          <Navbar logo={logo} onMenuClick={() => setOpen(true)} />
-
-          <Sidebar
-            open={open}
-            onClose={() => setOpen(false)}
-            darkMode={darkMode}
-            setDarkMode={setDarkMode}
-          />
+          <Navbar logo={logo} />
 
           <Box sx={{ display: "flex", minHeight: "calc(100vh - 64px)" }}>
-            {/* 3. تمرير دالة التغيير للمكون الجانبي */}
-            <InternalSidebar
-              darkMode={darkMode}
-              setActivePage={setActivePage}
-            />
+            <InternalSidebar setActivePage={setActivePage} />
 
-            {/* 4. عرض المحتوى المتغير */}
-            {/* محتوى الصفحة الرئيسي */}
             <Box
               component="main"
               sx={{
                 flexGrow: 1,
                 p: 3,
 
-                bgcolor: darkMode ? "#2b2a28" : "#EFEDE1",
+                bgcolor: "#EFEDE1",
 
                 minHeight: "calc(100vh - 64px)",
-                transition: "all 0.3s ease", // اختيارية: بتخلي قلبة اللون ناعمة للعين
+                transition: "all 0.3s ease",
               }}
             >
               {renderContent()}

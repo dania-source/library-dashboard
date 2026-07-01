@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { 
   TextField, Button, Box, Typography, Container, Paper, 
-  Autocomplete, Chip, Alert, CircularProgress 
+  Autocomplete, Chip, Alert, CircularProgress, MenuItem
 } from '@mui/material';
 import CloudUploadIcon from '@mui/icons-material/CloudUpload';
 import axios from 'axios';
@@ -15,6 +15,10 @@ const AddBook = () => {
         PageNumber: '',
         description: '',
         gener: [],
+        access_type: 'free', 
+        price: '',
+        trial_pages: '',
+        required_books_read: '',
     });
     const [files, setFiles] = useState({
         cover_img: null,
@@ -34,45 +38,64 @@ const AddBook = () => {
         setLoading(true);
         setMessage({ type: '', text: '' });
 
-        // استخدام FormData لدعم رفع الملفات
         const formData = new FormData();
         formData.append('title', bookData.title);
         formData.append('author', bookData.author);
         formData.append('PageNumber', bookData.PageNumber);
         formData.append('description', bookData.description);
         
-        // إرسال المصفوفة للـ Backend
-        bookData.gener.forEach((g) => formData.append('gener[]', g));
+        // تحويل القيمة العربية إلى الإنجليزية قبل الإرسال لتتطابق مع الـ Validation في الباك إيند
+        formData.append('access_type', bookData.access_type);
+
+        // إرسال الحقول الإضافية بناءً على نوع الوصول المختار
+        if (bookData.access_type === 'paid') formData.append('price', bookData.price);
+        if (bookData.access_type === 'trial') formData.append('trial_pages', bookData.trial_pages);
+        if (bookData.access_type === 'conditional') formData.append('required_books_read', bookData.required_books_read);
+        
+        // 👈 الطريقة الصحيحة لإرسال المصفوفة ليفهمها لارافيل الأصلي كـ array
+        bookData.gener.forEach((g, index) => {
+            formData.append(`gener[${index}]`, g);
+        });
 
         if (files.cover_img) formData.append('cover_img', files.cover_img);
         if (files.pdf_path) formData.append('pdf_path', files.pdf_path);
 
         try {
-          const response = await axios.post('http://localhost:8000/api/books', formData, {
-        headers: {
-            'Content-Type': 'multipart/form-data',
-            'Authorization': `Bearer ${localStorage.getItem('token')}`
-        }
-    });
+            const response = await axios.post('http://localhost:8000/api/books', formData, {
+                headers: {
+                    'Content-Type': 'multipart/form-data',
+                    'Authorization': `Bearer ${localStorage.getItem('token')}`
+                }
+            });
 
-    setMessage({ type: 'success', text: response.data.message });
-
-    // --- أضيفي هذه الأسطر هنا لتفريغ الحقول ---
-    setBookData({
-        title: '',
-        author: '',
-        PageNumber: '',
-        description: '',
-        gener: [],
-    });
-    setFiles({
-        cover_img: null,
-        pdf_path: null
-    });
             setMessage({ type: 'success', text: response.data.message });
+
+            // تفريغ الحقول بعد النجاح
+            setBookData({
+                title: '',
+                author: '',
+                PageNumber: '',
+                description: '',
+                gener: [],
+                access_type: 'free',
+                price: '',
+                trial_pages: '',
+                required_books_read: '',
+            });
+            setFiles({
+                cover_img: null,
+                pdf_path: null
+            });
+
         } catch (error) {
-            const errorMsg = error.response?.data?.message || "حدث خطأ أثناء الإضافة";
-            setMessage({ type: 'error', text: errorMsg });
+            // إظهار تفاصيل أخطاء الـ Validation القادمة من لارافيل لمعرفة السبب فوراً لو فشل
+            if (error.response?.data?.errors) {
+                const validationErrors = Object.values(error.response.data.errors).flat().join(' - ');
+                setMessage({ type: 'error', text: validationErrors });
+            } else {
+                const errorMsg = error.response?.data?.message || "حدث خطأ أثناء الإضافة";
+                setMessage({ type: 'error', text: errorMsg });
+            }
         } finally {
             setLoading(false);
         }
@@ -108,15 +131,50 @@ const AddBook = () => {
                         margin="normal" required
                     />
 
-                    {/* إدخال التصنيفات (Genres) */}
+                    {/* قائمة اختيار نوع الوصول ترسل القيم الإنجليزية مباشرة للباك إيند */}
+                    <TextField
+                        select
+                        fullWidth
+                        label="نوع الوصول للكتاب"
+                        name="access_type"
+                        value={bookData.access_type}
+                        onChange={handleChange}
+                        margin="normal"
+                        required
+                    >
+                        <MenuItem value="free">مجاني</MenuItem>
+                        <MenuItem value="paid">مدفوع</MenuItem>
+                        <MenuItem value="conditional">مشروط</MenuItem>
+                    </TextField>
+
+                    {/* ظهور مشروط للحقول الإضافية المطلوبة في الباك إيند */}
+                    {bookData.access_type === 'paid' && (
+                        <TextField
+                            fullWidth label="سعر الكتاب" name="price" type="number"
+                            value={bookData.price} onChange={handleChange}
+                            margin="normal" required
+                        />
+                    )}
+
+
+
+                    {bookData.access_type === 'conditional' && (
+                        <TextField
+                            fullWidth label="عدد الكتب المطلوب قراءتها لفتح هذا الكتاب" name="required_books_read" type="number"
+                            value={bookData.required_books_read} onChange={handleChange}
+                            margin="normal" required
+                        />
+                    )}
+
                     <Autocomplete
                         multiple
                         freeSolo
-                        options={[]} // يمكن جلب التصنيفات من API هنا
+                        options={[]} 
+                        value={bookData.gener}
                         onChange={(event, newValue) => setBookData({ ...bookData, gener: newValue })}
                         renderTags={(value, getTagProps) =>
                             value.map((option, index) => (
-                                <Chip label={option} {...getTagProps({ index })} />
+                                <Chip label={option} {...getTagProps({ index })} key={index} />
                             ))
                         }
                         renderInput={(params) => (
@@ -131,14 +189,13 @@ const AddBook = () => {
                         onChange={handleChange} margin="normal"
                     />
 
-                    {/* أزرار رفع الملفات */}
                     <Box sx={{ mt: 2, display: 'flex', gap: 2, flexWrap: 'wrap' }}>
                         <Button
                             variant="outlined" component="label"
                             startIcon={<CloudUploadIcon />}
                             color={files.cover_img ? "success" : "primary"}
                         >
-                            غلاف الكتاب
+                            {files.cover_img ? "تم اختيار الغلاف" : "غلاف الكتاب"}
                             <input type="file" hidden name="cover_img" accept="image/*" onChange={handleFileChange} />
                         </Button>
 
@@ -147,7 +204,7 @@ const AddBook = () => {
                             startIcon={<CloudUploadIcon />}
                             color={files.pdf_path ? "success" : "primary"}
                         >
-                            ملف PDF
+                            {files.pdf_path ? "تم اختيار ملف PDF" : "ملف PDF"}
                             <input type="file" hidden name="pdf_path" accept=".pdf" onChange={handleFileChange} />
                         </Button>
                     </Box>

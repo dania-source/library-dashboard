@@ -6,7 +6,7 @@ const Navbar = ({ logo, onMenuClick }) => {
     <AppBar 
       position="fixed" // التغيير هنا لجعلها ثابتة تماماً في أعلى الشاشة
       sx={{ 
-        backgroundColor: "#541029",
+        backgroundColor: "#480D21",
         zIndex: (theme) => theme.zIndex.drawer + 1 // لضمان بقائها فوق الـ Sidebar
       }}
     >
@@ -22,9 +22,7 @@ const Navbar = ({ logo, onMenuClick }) => {
             لوحة تحكم المكتبة
           </Typography>
         </Box>
-        <IconButton onClick={onMenuClick} color="inherit">
-          <MenuIcon />
-        </IconButton>
+       
       </Toolbar>
     </AppBar>
   );

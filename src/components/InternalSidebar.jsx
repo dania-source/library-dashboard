@@ -1,6 +1,6 @@
 import React from "react";
-import { Box, Typography, List, ListItemButton, ListItemText, Divider } from "@mui/material";
-
+import { Box, Divider,Typography,List, ListItem, ListItemButton, ListItemIcon, ListItemText } from "@mui/material";
+import BarChartIcon from "@mui/icons-material/BarChart"; // 1. استيراد أيقونة التحليلات
 // 1. أضفنا setActivePage هنا لكي نستقبلها من الأب (App.js)
 const InternalSidebar = ({ darkMode, setActivePage }) => {
 return (
@@ -70,7 +70,13 @@ return (
         <ListItemText primary=" تعديل كتاب " />
         </ListItemButton>
          <Divider sx={{ my: 1 }} />
-
+{/* 2. التبويبة الجديدة: التقارير المالية والتحليلات */}
+        <ListItem disablePadding>
+          <ListItemButton onClick={() => setActivePage("analytics")}>
+            <ListItemIcon></ListItemIcon>
+            <ListItemText primary="التقارير المالية" />
+          </ListItemButton>
+        </ListItem>
 
         </List>
     </Box>
